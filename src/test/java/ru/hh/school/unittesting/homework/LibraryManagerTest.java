@@ -1,24 +1,23 @@
-package ru.hh.school.unittesting.libraryManager;
+package ru.hh.school.unittesting.homework;
 
-import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.testng.annotations.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import ru.hh.school.unittesting.homework.LibraryManager;
-import ru.hh.school.unittesting.homework.NotificationService;
-import ru.hh.school.unittesting.homework.UserService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class LibraryManagerTest {
+class LibraryManagerTest {
     @Mock
     private NotificationService notificationService;
     @Mock
@@ -47,8 +46,8 @@ public class LibraryManagerTest {
         libraryManager.addBook(bookId, 1);
         when(userService.isUserActive(userId)).thenReturn(true);
         assertTrue(libraryManager.borrowBook(bookId, userId));
-        verify(userService, times(1)).isUserActive(userId);
-        verify(notificationService, times(1)).notifyUser(userId, "You have borrowed the book: " + bookId);
+        verify(userService, Mockito.times(1)).isUserActive(userId);
+        verify(notificationService, Mockito.times(1)).notifyUser(userId, "You have borrowed the book: " + bookId);
     }
 
     @Test
@@ -60,8 +59,8 @@ public class LibraryManagerTest {
         assertTrue(libraryManager.borrowBook("Лжец на кушетке", "stepanozo"));
         assertFalse(libraryManager.borrowBook("Лжец на кушетке", "stepanozo"));
 
-        verify(userService, times(3)).isUserActive("stepanozo");
-        verify(notificationService, times(2)).notifyUser("stepanozo", "You have borrowed the book: Лжец на кушетке");
+        verify(userService, Mockito.times(3)).isUserActive("stepanozo");
+        verify(notificationService, Mockito.times(2)).notifyUser("stepanozo", "You have borrowed the book: Лжец на кушетке");
     }
 
     @Test
@@ -69,7 +68,8 @@ public class LibraryManagerTest {
         when(userService.isUserActive("stepanozo")).thenReturn(false);
 
         assertFalse(libraryManager.borrowBook("Преступление и наказание", "stepanozo"));
-        verify(userService, times(1)).isUserActive("stepanozo");
+        verify(userService, Mockito.times(1)).isUserActive("stepanozo");
+        verify(notificationService, Mockito.times(2)).notifyUser("stepanozo", "Your account is not active.");
     }
 
     @Test
@@ -97,9 +97,9 @@ public class LibraryManagerTest {
         assertTrue(libraryManager.borrowBook("Преступление и наказание", "stepanozo"));
         assertTrue(libraryManager.returnBook("Преступление и наказание", "stepanozo"));
 
-        verify(userService, times(1)).isUserActive("stepanozo");
-        verify(notificationService, times(1)).notifyUser("stepanozo", "You have borrowed the book: Преступление и наказание");
-        verify(notificationService, times(1)).notifyUser("stepanozo", "You have returned the book: Преступление и наказание");
+        verify(userService, Mockito.times(1)).isUserActive("stepanozo");
+        verify(notificationService, Mockito.times(1)).notifyUser("stepanozo", "You have borrowed the book: Преступление и наказание");
+        verify(notificationService, Mockito.times(1)).notifyUser("stepanozo", "You have returned the book: Преступление и наказание");
     }
 
     @Test
@@ -112,11 +112,11 @@ public class LibraryManagerTest {
         assertTrue(libraryManager.returnBook("Преступление и наказание", "stepanozo"));
         assertTrue(libraryManager.borrowBook("Преступление и наказание", "Kirill030"));
 
-        verify(userService, times(1)).isUserActive("stepanozo");
-        verify(userService, times(2)).isUserActive("Kirill030");
-        verify(notificationService, times(1)).notifyUser("stepanozo", "You have borrowed the book: Преступление и наказание");
-        verify(notificationService, times(1)).notifyUser("stepanozo", "You have returned the book: Преступление и наказание");
-        verify(notificationService, times(1)).notifyUser("Kirill030", "You have borrowed the book: Преступление и наказание");
+        verify(userService, Mockito.times(1)).isUserActive("stepanozo");
+        verify(userService, Mockito.times(2)).isUserActive("Kirill030");
+        verify(notificationService, Mockito.times(1)).notifyUser("stepanozo", "You have borrowed the book: Преступление и наказание");
+        verify(notificationService, Mockito.times(1)).notifyUser("stepanozo", "You have returned the book: Преступление и наказание");
+        verify(notificationService, Mockito.times(1)).notifyUser("Kirill030", "You have borrowed the book: Преступление и наказание");
     }
 
     @Test
@@ -134,6 +134,7 @@ public class LibraryManagerTest {
             "3, false, true, 1.2",
             "5, true, false, 3.75",
             "7, false, false, 3.5",
+            "0, false, false, 0"
 
     })
     void calculateDynamicLateFeeTest(int overdueDays, boolean isBestseller, boolean isPremiumMember, double expectedResult) {
