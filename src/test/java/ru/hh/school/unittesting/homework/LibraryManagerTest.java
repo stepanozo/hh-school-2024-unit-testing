@@ -1,7 +1,7 @@
 package ru.hh.school.unittesting.homework;
 
 import org.mockito.Mockito;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -69,7 +69,7 @@ class LibraryManagerTest {
 
         assertFalse(libraryManager.borrowBook("Преступление и наказание", "stepanozo"));
         verify(userService, Mockito.times(1)).isUserActive("stepanozo");
-        verify(notificationService, Mockito.times(2)).notifyUser("stepanozo", "Your account is not active.");
+        verify(notificationService, Mockito.times(1)).notifyUser("stepanozo", "Your account is not active.");
     }
 
     @Test
